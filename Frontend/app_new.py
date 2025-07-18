@@ -15,6 +15,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from llama_index.llms.langchain import LangChainLLM
 from llama_index.core.llms import ChatMessage as LlamaChatMessage
 from llama_index.core.output_parsers import PydanticOutputParser
+from PIL import Image
 
 # ---------------- Environment & Setup ----------------
 load_dotenv()
@@ -186,10 +187,33 @@ def extract_name(text):
     if match:
         return match[0].strip()
     return "Candidate"
+def generate_application_email(name: str, job_title: str, matched_skills: list) -> str:
+    prompt = f"""
+Write a professional job application email.
+
+Candidate: {name}
+Role: {job_title}
+Skills: {', '.join(matched_skills)}
+do not add subject line.
+Start with a greeting, justify the application using the skills, and end formally.
+Don't mention attachments or resume.
+
+Output only the message body.
+"""
+    messages = [LlamaChatMessage(role="user", content=prompt)]
+    response = wrapped_llm.chat(messages)
+    return response.message.content.strip()
+
+
+def display_logo():
+    st.image("../assets/image.png", width=150)
+
+    
 
 # ---------------- Pages ----------------
 def start_page():
-    st.title("Welcome to Resume Optimizer")
+    st.title("CVOpsify - Resume Optimizer")
+    display_logo()
     col1, col2 = st.columns(2)
     if col1.button("Login"): st.session_state.page = "login"
     if col2.button("Signup"): st.session_state.page = "signup"
@@ -513,7 +537,9 @@ ACHIEVEMENTS
         recipient = st.text_input("Recipient Email")
         cc = st.text_input("CC (optional)", placeholder="comma-separated")
         subject = st.text_input("Subject", value=f"Application for {job_title} – {name}")
-        body = st.text_area("Message", value=f"Dear Hiring Team,\n\nI am writing to express my interest in the {job_title} position. Please find my optimized resume attached.\n\nRegards,\n{name}")
+        email_body = generate_application_email(name, job_title, matched_skills)
+        body = st.text_area("Message", value=email_body)
+
         send_btn = st.form_submit_button("Send Email")
 
     if send_btn:
