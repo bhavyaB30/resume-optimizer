@@ -17,6 +17,7 @@ from llama_index.core.llms import ChatMessage as LlamaChatMessage
 from llama_index.core.output_parsers import PydanticOutputParser
 from PIL import Image
 
+
 # ---------------- Environment & Setup ----------------
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -35,7 +36,7 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     temperature=0.2,
     convert_system_message_to_human=True,
-    google_api_key="AIzaSyB9qD8ymErEFtef3rcxJfv027bHFf6KJug"  # Set in .env
+    google_api_key="AIzaSyBSGpWM1o1ckDVqk5vSgu9EtntNeADEj8c"  # Set in .env
 )
 wrapped_llm = LangChainLLM(llm=llm)
 
@@ -189,7 +190,9 @@ def extract_name(text):
     return "Candidate"
 def generate_application_email(name: str, job_title: str, matched_skills: list) -> str:
     prompt = f"""
-Write a professional job application email.
+
+you are a professional EMail Genrartor and you have to write a email for a job application 
+based on the below details write a formal email to the hiring manager 
 
 Candidate: {name}
 Role: {job_title}
@@ -198,7 +201,8 @@ do not add subject line.
 Start with a greeting, justify the application using the skills, and end formally.
 Don't mention attachments or resume.
 
-Output only the message body.
+Output only the message body in a proper structured format without any additional text or explanation.
+
 """
     messages = [LlamaChatMessage(role="user", content=prompt)]
     response = wrapped_llm.chat(messages)
@@ -219,7 +223,9 @@ def start_page():
     if col2.button("Signup"): st.session_state.page = "signup"
 
 def signup_page():
+    display_logo()
     st.title("Signup")
+    
     with st.form("signup_form"):
         name = st.text_input("Name")
         email = st.text_input("Email")
@@ -238,7 +244,9 @@ def signup_page():
     if st.button("Back"): st.session_state.page = "start"
 
 def login_page():
+    display_logo()
     st.title("Login")
+    
     with st.form("login_form"):
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
@@ -255,11 +263,35 @@ def login_page():
             st.warning("Please fill both fields.")
     if st.button("Back"): st.session_state.page = "start"
 
+# def upload_jd_page():
+#     st.session_state.page = "upload_jd"
+#     st.title("🎯 Define Your Dream Role") 
+#     display_logo()
+#     with st.form("jd_form"):
+#         jd_text = st.text_area("Paste your job description here:")
+#         submit = st.form_submit_button("Continue")
+#     if submit and jd_text:
+#         st.session_state.jd = jd_text
+#         with st.spinner("Extracting skills from JD using Gemini..."):
+#             st.session_state.jd_skills = extract_skills_from_jd_with_llm(jd_text)
+#         st.success("✅ Skills extracted from JD successfully!")
+#         st.session_state.page = "fill_resume"
 def upload_jd_page():
-    st.title("Upload Job Description")
+    display_logo()
+    st.session_state.page = "upload_jd"
+    st.markdown("""
+        <h1 style="font-size: 2.8rem; margin-bottom: 0.2em;">🎯 Define Your Dream Role</h1>
+        <p style="font-size: 1.1rem; color: #666;">
+            Paste the job description below and we’ll tailor your resume to match it perfectly.
+        </p>
+    """, unsafe_allow_html=True)
+
+    
+
     with st.form("jd_form"):
         jd_text = st.text_area("Paste your job description here:")
         submit = st.form_submit_button("Continue")
+
     if submit and jd_text:
         st.session_state.jd = jd_text
         with st.spinner("Extracting skills from JD using Gemini..."):
@@ -269,7 +301,9 @@ def upload_jd_page():
 
 
 def fill_resume_page():
-    st.title("Resume Input")
+    display_logo()
+    st.title("📄 Upload or Create Resume")
+    
     uploaded_file = st.file_uploader("Upload Resume (PDF only)", type=["pdf"])
     structured = {}
 
@@ -402,10 +436,19 @@ ACHIEVEMENTS
         except Exception as e:
             st.error(f"❌ Exception: {e}")
 def result_page():
-    st.title("📄 Optimized Resume")
+    display_logo()
+    st.markdown(
+    "<h1 style='text-align: center; color: #2E86C1;'>Resume Insights Dashboard </h1>",
+    
+    unsafe_allow_html=True
+)
+
+    # st.title("📄 Optimized Resume")
+    
+    
 
     # ✅ Optimized Resume JSON Display
-    st.subheader("🧾 Optimized Resume (JSON View)")
+    st.subheader("🗂️ Resume Content Breakdown")
     st.json(st.session_state.optimized_json)
 
     # ✅ Initialize sets
@@ -423,14 +466,14 @@ def result_page():
     missing_skills = st.session_state.get("missing_skills", [])
     st.markdown(
         """
-         <div style="
+             <div style="
         background-color: #2e2e2e;
         padding: 15px;
         border-radius: 8px;
         border: 1px solid #666;
         margin-bottom: 10px;
     ">
-        <h4 style="color: #f5f5f5; margin: 0;">🛑 Missing Skills from JD</h4>
+        <h4 style="color: #f5f5f5; margin: 0;">🔍 Not Yet in Your Resume</h4>
     </div>
         """,
         unsafe_allow_html=True
@@ -452,15 +495,16 @@ def result_page():
     # ✅ Matched Skills Section
     st.markdown(
         """
-      <div style="
+     <div style="
         background-color: #2e2e2e;
         padding: 15px;
         border-radius: 8px;
         border: 1px solid #666;
         margin: 20px 0 10px 0;
     ">
-        <h4 style="color: #f5f5f5; margin: 0;">✅ Matched Skills (from JD already in Resume)</h4>
+        <h4 style="color: #f5f5f5; margin: 0;">🎯 Already Covered JD Skills</h4>
     </div>
+    
         """,
         unsafe_allow_html=True
     )
@@ -472,24 +516,24 @@ def result_page():
         st.info("No matched skills found — all JD skills are currently missing in the resume.")
 
     # ✅ Download Missing Skills JSON
-    missing_skills_json_bytes = json.dumps(missing_skills, indent=2).encode("utf-8")
-    st.download_button(
-        label="📥 Download Missing Skills (JSON)",
-        data=missing_skills_json_bytes,
-        file_name="missing_skills.json",
-        mime="application/json"
-    )
+    # missing_skills_json_bytes = json.dumps(missing_skills, indent=2).encode("utf-8")
+    # st.download_button(
+    #     label="📥 Download Missing Skills (JSON)",
+    #     data=missing_skills_json_bytes,
+    #     file_name="missing_skills.json",
+    #     mime="application/json"
+    # )
 
-    # ✅ Download Optimized Resume JSON
-    optimized_json_bytes = json.dumps(st.session_state.optimized_json, indent=2).encode("utf-8")
-    st.download_button(
-        label="📥 Download Optimized Resume (JSON)",
-        data=optimized_json_bytes,
-        file_name="optimized_resume.json",
-        mime="application/json"
-    )
+    # # ✅ Download Optimized Resume JSON
+    # optimized_json_bytes = json.dumps(st.session_state.optimized_json, indent=2).encode("utf-8")
+    # st.download_button(
+    #     label="📥 Download Optimized Resume (JSON)",
+    #     data=optimized_json_bytes,
+    #     file_name="optimized_resume.json",
+    #     mime="application/json"
+    # )
 
-    # ✅ Download Optimized Resume PDF (from latest optimized_json)
+    # ✅ Generate Optimized Resume Text for PDF
     optimized_resume = st.session_state.optimized_json
     resume_text = f"""
 Name: {optimized_resume.get("name", "")}
@@ -523,23 +567,63 @@ ACHIEVEMENTS
     pdf_bytes = generate_pdf(resume_text)
     name = st.session_state.get("name_for_email") or extract_name(resume_text)
     job_title = extract_job_title(st.session_state.jd)
-
+    st.markdown(
+    """
+    <style>
+    .button-style {
+        display: inline-flex;
+        align-items: center;
+        font-weight: 500;
+        padding: 10px 18px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        background-color: white;
+        color: black;
+        margin-bottom: 10px;
+        font-size: 15px;
+    }
+    .button-style img {
+        margin-right: 8px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
     st.download_button(
-        "📄 Download Optimized Resume (PDF)",
+        label="📌 Grab Optimized Resume",
         data=pdf_bytes,
         file_name="optimized_resume.pdf",
-        mime="application/pdf"
-    )
+        mime="application/pdf",
+        key="download_button"
+)
+
+    # ✅ EMAIL GENERATION BLOCK
+    if "generated_email" not in st.session_state:
+        st.session_state.generated_email = ""
+
+    if st.button("🤖 Craft Email with AI"):
+        with st.spinner("Generating formal email..."):
+            st.session_state.generated_email = generate_application_email(name, job_title, matched_skills)
+            st.success("✅ Email generated!")
+
+    default_email = f"""Dear Hiring Team,
+
+I am writing to express my interest in the {job_title} position. My skills in {', '.join(matched_skills)} make me a strong candidate.
+
+Thank you for considering my application.
+
+Regards,
+{name}
+"""
+    final_body = st.session_state.generated_email or default_email
 
     # ✅ Email Form
-    st.subheader("📧 Send Resume via Email")
+    st.subheader("📤 Email Your Application")
     with st.form("email_form"):
         recipient = st.text_input("Recipient Email")
         cc = st.text_input("CC (optional)", placeholder="comma-separated")
         subject = st.text_input("Subject", value=f"Application for {job_title} – {name}")
-        email_body = generate_application_email(name, job_title, matched_skills)
-        body = st.text_area("Message", value=email_body)
-
+        body = st.text_area("Message", value=final_body, height=200)
         send_btn = st.form_submit_button("Send Email")
 
     if send_btn:
@@ -551,10 +635,11 @@ ACHIEVEMENTS
             st.success(msg) if success else st.error(msg)
 
     # ✅ Navigation Buttons
-    if st.button("⬅️ Back to Resume Form"):
+    if st.button("🛠️ Edit My Resume"):
         st.session_state.page = "fill_resume"
-
-    if st.button("🔁 Start Over"):
+    if st.button("📄 Review Job Description"):
+        st.session_state.page = "upload_jd"
+    if st.button("♻️ Start From Scratch"):
         st.session_state.page = "start"
         st.session_state.optimized = ""
         st.session_state.optimized_json = {}

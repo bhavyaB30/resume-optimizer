@@ -313,7 +313,7 @@ def extract_resume_data(data: ResumeData):
 
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.0-flash",
-        google_api_key="AIzaSyB9qD8ymErEFtef3rcxJfv027bHFf6KJug"
+        google_api_key="AIzaSyBSGpWM1o1ckDVqk5vSgu9EtntNeADEj8c"
     )
 
     prompt = PromptTemplate.from_template("""
@@ -432,7 +432,7 @@ def extract_missing_skills_fallback(jd: str, resume: str):
 def optimize_resume(data: ResumeOptimizationRequest):
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.0-flash",
-        google_api_key="AIzaSyB9qD8ymErEFtef3rcxJfv027bHFf6KJug"
+        google_api_key="AIzaSyBSGpWM1o1ckDVqk5vSgu9EtntNeADEj8c"
     )
 
     prompt = PromptTemplate(
