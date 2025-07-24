@@ -216,8 +216,9 @@ def display_logo():
 
 # ---------------- Pages ----------------
 def start_page():
-    st.title("CVOpsify - Resume Optimizer")
     display_logo()
+    st.title("CVOpsify - Resume Optimizer")
+    
     col1, col2 = st.columns(2)
     if col1.button("Login"): st.session_state.page = "login"
     if col2.button("Signup"): st.session_state.page = "signup"
@@ -341,8 +342,15 @@ def fill_resume_page():
     certs = st.text_area("Certifications", value="\n".join(structured.get("certifications", [])))
     cca = st.text_area("Co-Curricular Activities", value="\n".join(structured.get("co_curricular_activities", [])))
 
+
+
+    if st.button("📄 Review Job Description"):
+        st.session_state.page = "upload_jd"        
+
+
     if st.button("Submit & Optimize Resume"):
         missing = [f for f, v in [("Full Name", name), ("Contact Number", contact), ("Email", email), ("Skills", skills)] if not safe_strip(v)]
+
 
         if missing:
             st.warning("Please fill in required fields:\n- " + "\n- ".join(missing))
@@ -377,6 +385,8 @@ CO-CURRICULAR ACTIVITIES
 """
             
             send_to_backend(st.session_state.jd, resume)
+
+        
 
 
 def send_to_backend(jd, resume):
@@ -632,7 +642,7 @@ Regards,
         else:
             cc_list = [x.strip() for x in cc.split(",")] if cc else []
             success, msg = send_email_with_resume(subject, body, [recipient], pdf_bytes, cc=cc_list)
-            st.success(msg) if success else st.error(msg)
+            st.success(msg) #if success else st.error(msg)
 
     # ✅ Navigation Buttons
     if st.button("🛠️ Edit My Resume"):

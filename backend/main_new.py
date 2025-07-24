@@ -583,7 +583,7 @@ If no skills are missing, return an empty list: []
 #     # ✅ Initialize the Gemini LLM
 #     llm = ChatGoogleGenerativeAI(
 #         model="gemini-2.0-flash",
-#         google_api_key="AIzaSyB9qD8ymErEFtef3rcxJfv027bHFf6KJug"
+#         google_api_key=""
 #     )
 
 #     # ✅ Prompt template for extracting missing skills
@@ -628,5 +628,3 @@ If no skills are missing, return an empty list: []
     # except Exception as e:
     #     print("❌ LLM invocation error:", e)
     #     return {"error": str(e), "missing_skills": []}
-
-

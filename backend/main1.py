@@ -513,6 +513,13 @@ TASK:
    - "google sheets", "google spreadsheet"
    - "cv", "computer vision"
    - "keras", "tensorflow keras"
+   - "llm"/llm's, "large language model"
+   -"llm": "llm",
+    -"llms": "llm",
+   - "llm's": "llm",
+    -"large language model": "llm",
+    -"large language models": "llm",
+    -"Large Language Models (LLM)" ,LLMs
 
 OUTPUT:
 Return a JSON object with two keys:
