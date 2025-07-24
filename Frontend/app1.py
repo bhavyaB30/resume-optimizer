@@ -34,7 +34,7 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     temperature=0.2,
     convert_system_message_to_human=True,
-    google_api_key="AIzaSyB9qD8ymErEFtef3rcxJfv027bHFf6KJug"  # Set in .env
+    google_api_key=""  # Set in .env
 )
 wrapped_llm = LangChainLLM(llm=llm)
 

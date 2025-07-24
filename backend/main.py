@@ -125,7 +125,7 @@ def extract_resume_data_api(data: ResumeText):
 
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.0-flash",
-        google_api_key="AIzaSyB9qD8ymErEFtef3rcxJfv027bHFf6KJug"
+        google_api_key=""
     )
 
     prompt = PromptTemplate.from_template("""
@@ -174,7 +174,7 @@ Resume Text:
 def optimize_resume(data: ResumeOptimizationRequest):
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.0-flash",
-        google_api_key="AIzaSyB9qD8ymErEFtef3rcxJfv027bHFf6KJug"
+        google_api_key=""
     )
 
     prompt = PromptTemplate(
